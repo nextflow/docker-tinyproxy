@@ -8,7 +8,7 @@ TAIL_LOG='/var/log/tinyproxy/tinyproxy.log'
 # Usage: screenOut STATUS message
 screenOut() {
     timestamp=$(date +"%H:%M:%S")
-    
+
     if [ "$#" -ne 2 ]; then
         status='INFO'
         message="$1"
@@ -72,6 +72,13 @@ parseAccessRules() {
     echo "$list" | sed 's/.\{2\}$//'
 }
 
+setDefault() {
+    screenOut "Setting up Default"
+    sed -i -e"s/MaxClients 100/MaxClients 100000 /" $PROXY_CONF
+    sed -i -e"s/MaxSpareServers 20/MaxSpareServers 100 /" $PROXY_CONF
+    sed -i -e"s/#DisableViaHeader Yes/DisableViaHeader Yes /" $PROXY_CONF
+}
+
 setMiscConfig() {
     sed -i -e"s,^MinSpareServers ,MinSpareServers\t1 ," $PROXY_CONF
     checkStatus $? "Set MinSpareServers - Could not edit $PROXY_CONF" \
@@ -80,7 +87,7 @@ setMiscConfig() {
     sed -i -e"s,^MaxSpareServers ,MaxSpareServers\t1 ," $PROXY_CONF
     checkStatus $? "Set MinSpareServers - Could not edit $PROXY_CONF" \
                    "Set MinSpareServers - Edited $PROXY_CONF successfully."
-    
+
     sed -i -e"s,^StartServers ,StartServers\t1 ," $PROXY_CONF
     checkStatus $? "Set MinSpareServers - Could not edit $PROXY_CONF" \
                    "Set MinSpareServers - Edited $PROXY_CONF successfully."
@@ -119,18 +126,18 @@ setFilter(){
         screenOut "Setting up FilterURLs."
         sed -i -e"s/#FilterURLs Yes/FilterURLs $FilterURLs/" $PROXY_CONF
     fi
-    
+
     if [ -n "$FilterExtended" ] ; then
             screenOut "Setting up FilterExtended."
             sed -i -e"s/#FilterExtended Yes/FilterExtended $FilterExtended/" $PROXY_CONF
     fi
-    
+
     if [ -n "$FilterCaseSensitive" ] ; then
             screenOut "Setting up FilterCaseSensitive."
             sed -i -e"s/#FilterCaseSensitive Yes/FilterCaseSensitive $FilterCaseSensitive/" $PROXY_CONF
     fi
-    
-    
+
+
     if [ -n "$Filter" ] ; then
             screenOut "Setting up Filter."
             sed -i -e"s+#Filter \"/etc/tinyproxy/filter\"+Filter \"$Filter\"+" $PROXY_CONF
@@ -173,6 +180,7 @@ stopService
 export rawRules="$@" && parsedRules=$(parseAccessRules $rawRules) && unset rawRules
 # Set ACL in Tinyproxy config
 setAccess $parsedRules
+setDefault
 # Enable basic auth (if any)
 setAuth
 # Enable Filtering (if any)
