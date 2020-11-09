@@ -3,7 +3,7 @@
 # Global vars
 PROG_NAME='DockerTinyproxy'
 PROXY_CONF='/etc/tinyproxy/tinyproxy.conf'
-TAIL_LOG='/var/log/tinyproxy/tinyproxy.log'
+TAIL_LOG='/dev/stdout'
 
 # Usage: screenOut STATUS message
 screenOut() {
@@ -161,7 +161,7 @@ startService() {
 }
 
 tailLog() {
-    touch /var/log/tinyproxy/tinyproxy.log
+#    touch /var/log/tinyproxy/tinyproxy.log
     screenOut "Tailing Tinyproxy log..."
     tail -f $TAIL_LOG
     checkStatus $? "Could not tail $TAIL_LOG" \
