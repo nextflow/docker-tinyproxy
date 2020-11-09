@@ -95,6 +95,7 @@ setMiscConfig() {
 
 enableLogFile() {
 	sed -i -e"s,^#LogFile,LogFile," $PROXY_CONF
+	sed -i -e"s/\/var\/log\/tinyproxy\/tinyproxy\.log/\/dev\/null/" $PROXY_CONF
 }
 
 setAccess() {
