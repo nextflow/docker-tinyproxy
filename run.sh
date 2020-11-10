@@ -3,7 +3,7 @@
 # Global vars
 PROG_NAME='DockerTinyproxy'
 PROXY_CONF='/etc/tinyproxy/tinyproxy.conf'
-TAIL_LOG='/dev/stdout'
+TAIL_LOG='/var/log/tinyproxy/tinyproxy.log'
 
 # Usage: screenOut STATUS message
 screenOut() {
@@ -95,7 +95,6 @@ setMiscConfig() {
 
 enableLogFile() {
 	sed -i -e"s,^#LogFile,LogFile," $PROXY_CONF
-	sed -i -e"s/\/var\/log\/tinyproxy\/tinyproxy\.log/\/dev\/stdout/" $PROXY_CONF
 }
 
 setAccess() {
@@ -161,7 +160,7 @@ startService() {
 }
 
 tailLog() {
-#    touch /var/log/tinyproxy/tinyproxy.log
+    touch /var/log/tinyproxy/tinyproxy.log
     screenOut "Tailing Tinyproxy log..."
     tail -f $TAIL_LOG
     checkStatus $? "Could not tail $TAIL_LOG" \
